@@ -14,7 +14,7 @@
    <string>Редагувати</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QListView" name="listView">
+   <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -23,6 +23,11 @@
       <height>491</height>
      </rect>
     </property>
+    <column>
+     <property name="text">
+      <string>Значення</string>
+     </property>
+    </column>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">

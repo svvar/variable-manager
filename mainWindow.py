@@ -9,28 +9,37 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QTableWidgetItem
+
 from createWindow import Ui_SecondWindow
 from EditWindow import Ui_EditWindow
-class Ui_mainWindow(object):
-    def openCreateWindow(self):
-        self.window = QtWidgets.QMainWindow()
-        self.ui = Ui_SecondWindow()
-        self.ui.setupUi(self.window)
-        self.window.show()
 
-    def openEditWindow(self):
-        self.window = QtWidgets.QMainWindow()
-        self.ui = Ui_EditWindow()
-        self.ui.setupUi(self.window)
-        self.window.show()
+class Ui_mainWindow(object):
+
     def setupUi(self, mainWindow):
         mainWindow.setObjectName("mainWindow")
         mainWindow.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(mainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
+        self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(30, 0, 741, 81))
+        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
+        self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout.setObjectName("gridLayout")
+
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit.setGeometry(QtCore.QRect(30, 20, 741, 31))
         self.lineEdit.setObjectName("lineEdit")
+        self.gridLayout.addWidget(self.lineEdit, 0, 1)
+
+        self.label = QtWidgets.QLabel(self.gridLayoutWidget)
+        self.label.setObjectName("label")
+        self.gridLayout.addWidget(self.label, 0, 0)
+
+
+
         self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
         self.tableWidget.setGeometry(QtCore.QRect(30, 70, 741, 391))
         self.tableWidget.setMinimumSize(QtCore.QSize(741, 0))
@@ -38,6 +47,11 @@ class Ui_mainWindow(object):
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(2)
         self.tableWidget.setRowCount(0)
+        self.tableWidget.setColumnWidth(0, int(0.2 * self.tableWidget.viewport().width()))
+        self.tableWidget.setColumnWidth(1, self.tableWidget.viewport().width() - self.tableWidget.columnWidth(0) - 20)
+        self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        self.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -45,10 +59,11 @@ class Ui_mainWindow(object):
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(670, 480, 93, 28))
         self.pushButton.setObjectName("pushButton")
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.openEditWindow())
+        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setGeometry(QtCore.QRect(560, 480, 93, 28))
         self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.openCreateWindow())
+        self.pushButton_2.setEnabled(False)
+        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_3.setGeometry(QtCore.QRect(450, 480, 93, 28))
         self.pushButton_3.setObjectName("pushButton_3")
         self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget)
@@ -78,6 +93,7 @@ class Ui_mainWindow(object):
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
         mainWindow.setWindowTitle(_translate("mainWindow", "Змінні внутрішнього серидовища віндовс"))
+        self.label.setText(_translate("mainWindow", "Пошук: "))
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("mainWindow", "Змінна"))
         item = self.tableWidget.horizontalHeaderItem(1)
@@ -90,6 +106,15 @@ class Ui_mainWindow(object):
         self.action.setText(_translate("mainWindow", "Зробити резервну копію"))
         self.action_2.setText(_translate("mainWindow", "Відновити із резервної копії"))
 
+
+def open_window():
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    mainWindow = QtWidgets.QMainWindow()
+    ui = Ui_mainWindow()
+    ui.setupUi(mainWindow)
+    mainWindow.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     import sys

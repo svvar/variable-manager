@@ -17,9 +17,15 @@ class Ui_EditWindow(object):
         EditWindow.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(EditWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.listView = QtWidgets.QListView(self.centralwidget)
-        self.listView.setGeometry(QtCore.QRect(10, 30, 531, 491))
-        self.listView.setObjectName("listView")
+
+        self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
+        self.tableWidget.setGeometry(QtCore.QRect(10, 30, 531, 491))
+        self.tableWidget.setObjectName("valuesTable")
+        self.tableWidget.setColumnCount(1)
+        self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.horizontalHeader().setVisible(False)
+        self.tableWidget.setColumnWidth(0, self.tableWidget.viewport().width())
+
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(590, 60, 181, 351))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
