@@ -49,6 +49,7 @@ class Ui_SecondWindow(object):
         self.horizontalLayout_3.addWidget(self.pushButton_3)
         self.pushButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
         self.pushButton.setObjectName("pushButton")
+        self.pushButton.setEnabled(False)
         self.horizontalLayout_3.addWidget(self.pushButton)
         self.pushButton_4 = QtWidgets.QPushButton(self.horizontalLayoutWidget)
         self.pushButton_4.setObjectName("pushButton_4")

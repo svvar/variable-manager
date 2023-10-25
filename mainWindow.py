@@ -57,6 +57,8 @@ class Ui_mainWindow(object):
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(1, item)
+        self.tableWidget.setStyleSheet("QTableWidget::item:selected { background-color: #0078d7; color: white; }")
+
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(670, 480, 93, 28))
         self.pushButton.setObjectName("pushButton")

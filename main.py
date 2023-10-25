@@ -1,6 +1,8 @@
+import enum
 import os, sys
 
-from PyQt5.QtCore import QStringListModel
+import PyQt5
+from PyQt5.QtCore import QStringListModel, QObject, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QFileDialog, QMessageBox
 
 import createWindow, mainWindow, EditWindow
@@ -13,16 +15,22 @@ class VariableManagerMain(QMainWindow):
 
         self.main_ui = mainWindow.Ui_mainWindow()
 
+        self.edit_window = VariableManagerEdit()
+        self.creation_window = VariableManagerCreate()
+        self.creation_window.creation_window_closed.connect(self.load_data)
+
         self.main_ui.setupUi(self)
 
-        self.load_data(dict(os.environ))
+        self.load_data()
 
         self.main_ui.lineEdit.textChanged.connect(self.auto_filter)
         self.main_ui.tableWidget.itemClicked.connect(self.enable_editing)
         self.main_ui.pushButton.clicked.connect(self.delete)
         self.main_ui.pushButton_2.clicked.connect(self.enter_edit_mode)
+        self.main_ui.pushButton_3.clicked.connect(self.enter_create_mode)
 
-    def load_data(self, data):
+    def load_data(self):
+        data = dict(os.environ)
         table = self.main_ui.tableWidget
         table.setRowCount(len(data))
 
@@ -55,7 +63,6 @@ class VariableManagerMain(QMainWindow):
         selected_variable_content = self.main_ui.tableWidget.selectedItems()[1].text()
         variable_values = selected_variable_content.split(';')
 
-        self.edit_window = VariableManagerEdit()
         self.edit_window.edit_ui.tableWidget.setRowCount(len(variable_values))
 
         # деякі значення можуть повторюватися у змінній, тому ітеруємо незвичним на перший погляд чином
@@ -63,14 +70,16 @@ class VariableManagerMain(QMainWindow):
             self.edit_window.edit_ui.tableWidget.setItem(n, 0, QTableWidgetItem(variable_values[n]))
         self.edit_window.show()
 
+    def enter_create_mode(self):
+        self.creation_window.show()
+
     def delete(self):
         item = self.main_ui.tableWidget.selectedItems()[0]
         row = item.row()
-        while row < self.main_ui.tableWidget.rowCount() - 1:
-            self.swap_items(row, row + 1)
-            row += 1
 
-        self.main_ui.tableWidget.setRowCount(self.main_ui.tableWidget.rowCount() - 1)
+        del os.environ[item.text()]
+
+        self.load_data()
         self.main_ui.tableWidget.clearSelection()
         self.main_ui.pushButton_2.setEnabled(False)
 
@@ -97,10 +106,7 @@ class VariableManagerEdit(QMainWindow):
         self.edit_ui.pushButton_5.clicked.connect(self.up)
         self.edit_ui.pushButton_6.clicked.connect(self.down)
         self.edit_ui.pushButton_8.clicked.connect(self.save)
-        self.edit_ui.pushButton_9.clicked.connect(self.close_window)
-
-    def close_window(self):
-        self.close()
+        self.edit_ui.pushButton_9.clicked.connect(self.close)
 
     def enable_buttons(self):
         self.edit_ui.pushButton_2.setEnabled(True)
@@ -133,6 +139,7 @@ class VariableManagerEdit(QMainWindow):
         folder_path = QFileDialog.getExistingDirectory(self, "Select Folder", options=options)
 
     def delete(self):
+        # TODO Make it actually delete
         item = self.edit_ui.tableWidget.selectedItems()[0]
         row = item.row()
         while row < self.edit_ui.tableWidget.rowCount() - 1:
@@ -175,7 +182,7 @@ class VariableManagerEdit(QMainWindow):
 
         # TODO REWRITE VARIABLE HERE
 
-        self.close_window()
+        self.close()
 
     def swap_items(self, row1, row2):
         item1 = self.edit_ui.tableWidget.takeItem(row1, 0)
@@ -184,6 +191,43 @@ class VariableManagerEdit(QMainWindow):
         self.edit_ui.tableWidget.setItem(row1, 0, item2)
         self.edit_ui.tableWidget.setItem(row2, 0, item1)
 
+
+class VariableManagerCreate(QMainWindow):
+    creation_window_closed = PyQt5.QtCore.pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+
+        self.create_ui = createWindow.Ui_SecondWindow()
+        self.create_ui.setupUi(self)
+
+
+        self.create_ui.lineEdit.textChanged.connect(self.update_button)
+        self.create_ui.lineEdit_2.textChanged.connect(self.update_button)
+        self.create_ui.pushButton.clicked.connect(self.save_variable)
+        # self.create_ui.pushButton_2.clicked.connect(pass)
+        # self.create_ui.pushButton_3.connect(self.browse)
+        self.create_ui.pushButton_4.clicked.connect(self.close)
+
+    def update_button(self):
+        line1 = self.create_ui.lineEdit.text()
+        line2 = self.create_ui.lineEdit_2.text()
+
+        if line1 != "" and line2 != "":
+            self.create_ui.pushButton.setEnabled(True)
+        else:
+            self.create_ui.pushButton.setEnabled(False)
+
+    def save_variable(self):
+        name = self.create_ui.lineEdit.text()
+        value = self.create_ui.lineEdit_2.text()
+
+        os.environ[name] = value
+        self.close()
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.creation_window_closed.emit()
+        super().closeEvent(a0)
 
 
 if __name__ == '__main__':
